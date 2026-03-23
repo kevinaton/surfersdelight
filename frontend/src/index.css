@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --sky-blue: #87CEEB;
+  --turquoise: #40E0D0;
+  --sun-drenched-yellow: #fff519;
+  --deep-teal: #042f2e; /* Tailwind Teal 950 */
+  --font-beachy: "Pacifico", cursive;
+}
+
+@theme {
+  --color-sky-blue: var(--sky-blue);
+  --color-turquoise: var(--turquoise);
+  --color-sun-yellow: var(--sun-drenched-yellow);
+  --color-deep-teal: var(--deep-teal);
+  --font-beachy: var(--font-beachy);
+}
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen bg-linear-to-b from-[#87CEEB] to-[#40E0D0] antialiased text-deep-teal font-medium;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+  }
+}
+
+.glass-card {
+  @apply bg-white/25 backdrop-blur-md border border-white/40 shadow-2xl;
+}
+
+.btn-primary {
+  @apply bg-sun-yellow text-[#042f2e] font-black shadow-lg transform active:scale-95 transition-all;
+}
+
+.onboarding-dot {
+  @apply w-3 h-3 rounded-full transition-all duration-300;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(4, 47, 46, 0.3);
+  border-radius: 10px;
+}
