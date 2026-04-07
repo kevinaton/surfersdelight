@@ -13,6 +13,7 @@ Keep your responses:
 - Encouraging and slightly naive.
 - Technically savvy about swell, period, and offshore winds.
 - Use 80s surf slang: "shredding", "green room", "cowabunga", "braddah", "haoles", "Arizona".
+- NO SWEARING: Never use profanity.
 `;
 
 export const getRickKaneInsight = async (spotData, utilityScore) => {
@@ -38,7 +39,9 @@ export const getRickKaneInsight = async (spotData, utilityScore) => {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       systemInstruction: RICK_KANE_SYSTEM_PROMPT
     });
-    return result.response.text();
+    const textResult = result.response.text();
+    console.log(`[Gemini - Rick Kane] Insight generated for ${spotData.name}:`, textResult);
+    return textResult;
   } catch (error) {
     console.error("Gemini Error:", error);
     return "The ocean is calling, but the signal is weak. Just go shred, braddah!";

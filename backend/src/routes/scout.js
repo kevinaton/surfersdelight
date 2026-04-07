@@ -3,57 +3,66 @@ import axios from 'axios';
 import { getQualityScore, calculateUtilityScore } from '../utils/scoring.js';
 import { getRickKaneInsight } from '../services/gemini.js';
 import { getCrowdFriction } from '../services/crowd.js';
-import { getTrafficFriction } from '../services/routing.js';
-import { supabase } from '../config/supabase.js';
+import { getTrafficData } from '../services/routing.js';
+import { logSessionData } from '../utils/logger.js';
 
 const router = express.Router();
-const MOCK_USER_ID = process.env.MOCK_USER_ID;
 
 /**
- * Fetch real-time marine data from Open-Meteo
+ * Fetch real-time marine data from Open-Meteo.
+ * Includes a "seaward nudge" logic: if the exact coordinates return null (due to being on land),
+ * it tries nearby coordinates to find the nearest water/sea point.
  */
 const fetchMarineData = async (lat, lon) => {
-  try {
-    const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_period,wave_direction,wind_wave_height,wind_wave_period,wind_wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction`;
-    const response = await axios.get(url);
-    return response.data.current;
-  } catch (error) {
-    console.error("Open-Meteo Error:", error.message);
-    return null;
-  }
-};
+  const nudges = [
+    { dLat: 0, dLon: 0 },      // 1. Original
+    { dLat: 0.05, dLon: 0 },   // 2. North
+    { dLat: -0.05, dLon: 0 },  // 3. South
+    { dLat: 0, dLon: 0.05 },   // 4. East
+    { dLat: 0, dLon: -0.05 },  // 5. West
+    { dLat: 0.05, dLon: -0.05 } // 6. North-West (Specific for Macajalar Bay/CDO)
+  ];
 
-router.get('/current', async (req, res) => {
-  const { userName } = req.query;
-  console.log(`Scout Request for User: ${userName}`);
-  
-  // 1. Fetch User Preferences from Supabase by Name
-  let sensitivity = 5;
-  let userSpots = [];
-
-  if (supabase && userName) {
-    const { data, error } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('user_name', userName)
-      .single();
-
-    if (error) console.error("Supabase Fetch Error:", error.message);
-
-    if (data) {
-      sensitivity = data.friction_sensitivity || 5;
-      userSpots = data.spots || [];
-      console.log(`Found ${userSpots.length} user spots in DB:`, userSpots.map(s => s.name));
+  for (const nudge of nudges) {
+    try {
+      const nLat = lat + nudge.dLat;
+      const nLon = lon + nudge.dLon;
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${nLat}&longitude=${nLon}&current=wave_height,wave_period,wave_direction,wind_wave_height,wind_wave_period,wind_wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction`;
+      
+      const response = await axios.get(url);
+      
+      // Check if we have valid numerical data for wave height
+      if (response.data?.current?.wave_height !== null && response.data?.current?.wave_height !== undefined) {
+        if (nudge.dLat !== 0 || nudge.dLon !== 0) {
+          console.log(`[Marine API] Nudge successful for (${lat}, ${lon}) -> moved to (${nLat.toFixed(4)}, ${nLon.toFixed(4)})`);
+        }
+        return response.data;
+      } else {
+        console.log(`[Marine API] No water data at (${nLat.toFixed(4)}, ${nLon.toFixed(4)}), trying next nudge...`);
+      }
+    } catch (error) {
+      console.error(`[Marine API] Error at (${(lat + nudge.dLat).toFixed(4)}, ${(lon + nudge.dLon).toFixed(4)}):`, error.message);
     }
   }
-
-  // 2. Define Spots
-  // Filter based on user onboarding choices
-  // If user has chosen spots, use those objects directly!
-  const spotsToScout = userSpots.length > 0 ? userSpots : [];
   
-  console.log(`Processing ${spotsToScout.length} spots...`);
+  console.error(`[Marine API] Failed to find water data for (${lat}, ${lon}) after all nudges.`);
+  return null;
+};
 
+/**
+ * Stateless Scout: Frontend sends spots and home location directly.
+ */
+router.post('/current', async (req, res) => {
+  const { userName, spots, home_location, sensitivity = 5 } = req.body;
+  
+  console.log(`Scout Request for User: ${userName} from ${home_location?.name || 'Unknown'}`);
+  
+  const userOrigin = home_location && home_location.lat 
+    ? { lat: home_location.lat, lon: home_location.lon }
+    : { lat: 21.3069, lon: -157.8583 }; // Fallback to Honolulu
+
+  const spotsToScout = spots || [];
+  
   if (spotsToScout.length === 0) {
     return res.json({ 
       timestamp: new Date().toISOString(), 
@@ -63,26 +72,28 @@ router.get('/current', async (req, res) => {
     });
   }
 
+  const raw_api_logs = [];
+
   const results = await Promise.all(spotsToScout.map(async (spot) => {
     try {
       console.log(`Scouting ${spot.name}...`);
-      // 3. Fetch Real Marine Data
-      const marine = await fetchMarineData(spot.lat, spot.lon);
+      // 1. Fetch Real Marine Data
+      const marineResponse = await fetchMarineData(spot.lat, spot.lon);
+      const marine = marineResponse?.current;
       const waveHeight = marine ? (marine.swell_wave_height || 1.5) * 3.28 : 5; 
       const period = marine ? (marine.swell_wave_period || 12) : 14;
       
-      // 4. Fetch Crowd Friction (Use Mock ID if not provided)
+      // 2. Fetch Crowd Friction
       const crowdFriction = await getCrowdFriction(spot.venueId || 'mock_venue');
 
-      // 5. Fetch Traffic Friction
-      const userOrigin = { lat: 21.3069, lon: -157.8583 }; // Honolulu
-      const trafficFriction = await getTrafficFriction(userOrigin, { lat: spot.lat, lon: spot.lon });
+      // 3. Fetch Real Traffic Data
+      const traffic = await getTrafficData(userOrigin, { lat: spot.lat, lon: spot.lon });
 
-      // 6. Calculate Scores
+      // 4. Calculate Scores
       const qScore = getQualityScore(waveHeight, period, 8, true); 
-      const uScore = calculateUtilityScore(qScore, trafficFriction, crowdFriction, sensitivity);
+      const uScore = calculateUtilityScore(qScore, traffic.friction, crowdFriction, sensitivity);
 
-      // 7. Get Rick Kane Personality
+      // 5. Get Rick Kane Personality
       const spotData = {
         name: spot.name,
         waveHeight: parseFloat(waveHeight.toFixed(1)),
@@ -92,16 +103,29 @@ router.get('/current', async (req, res) => {
       };
       const insight = await getRickKaneInsight(spotData, uScore);
 
+      // Log Raw Data for this spot
+      raw_api_logs.push({
+        spotName: spot.name,
+        marine_raw: marineResponse,
+        traffic_raw: traffic,
+        crowd_raw: { friction: crowdFriction },
+        scoring: { qualityScore: qScore, utilityScore: uScore },
+        rick_kane_insight: insight
+      });
+
       return {
         ...spotData,
         lat: spot.lat,
         lon: spot.lon,
         qualityScore: qScore,
         utilityScore: uScore,
+        travelTimeInSeconds: traffic.travelTimeInSeconds,
+        travelTimeText: `${Math.round(traffic.travelTimeInSeconds / 60)} min`,
         rickKaneInsight: insight,
+        points: traffic.points,
         friction: {
           crowd: crowdFriction,
-          traffic: trafficFriction
+          traffic: traffic.friction
         }
       };
     } catch (spotErr) {
@@ -113,14 +137,27 @@ router.get('/current', async (req, res) => {
   const filteredResults = results.filter(r => r !== null);
   filteredResults.sort((a, b) => b.utilityScore - a.utilityScore);
 
-  console.log(`Scout completed with ${filteredResults.length} results.`);
+  // Capture everything to data.json
+  logSessionData({
+    user_inputs: {
+      userName,
+      home_location,
+      sensitivity,
+      spotsTracked: spotsToScout.length
+    },
+    api_responses: {
+      scout_results: raw_api_logs
+    },
+    final_output: filteredResults
+  });
 
   res.json({
     timestamp: new Date().toISOString(),
     topSpots: filteredResults,
     userContext: {
       sensitivity,
-      spotsTracked: userSpots.length
+      spotsTracked: spotsToScout.length,
+      origin: home_location?.name || 'Default (Honolulu)'
     }
   });
 });

@@ -15,6 +15,7 @@ router.get('/search', async (req, res) => {
   try {
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&apiKey=${API_KEY}`;
     const response = await axios.get(url);
+    console.log(`[Geoapify Geocoding] Found ${response.data.features.length} results for: ${text}`);
     
     const results = response.data.features.map(f => ({
       name: f.properties.formatted,

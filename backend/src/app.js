@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import scoutRoutes from './routes/scout.js';
 import itineraryRoutes from './routes/itinerary.js';
 import chatRoutes from './routes/chat.js';
-import preferencesRoutes from './routes/preferences.js';
 import geocodingRoutes from './routes/geocoding.js';
 
 dotenv.config();
@@ -18,7 +17,6 @@ app.use(express.json());
 app.use('/api/scout', scoutRoutes);
 app.use('/api/itinerary', itineraryRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/preferences', preferencesRoutes);
 app.use('/api/geocoding', geocodingRoutes);
 
 app.get('/health', (req, res) => {

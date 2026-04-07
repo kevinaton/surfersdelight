@@ -11,17 +11,16 @@ const BASE_URL = 'https://besttime.app/api/v1';
  * For the PoC, we will use local landmarks as proxies for beach crowds.
  */
 export const getCrowdFriction = async (venueId) => {
-  if (!API_KEY || API_KEY === 'MOCK_KEY') {
+  if (!API_KEY || API_KEY === 'MOCK_KEY' || venueId === 'mock_venue') {
     return 0.2; // Default mock friction
   }
 
   try {
     // BestTime.app "Forecast" or "Live" request
     // For PoC simplicity, we'll use a 0-1 friction score based on live%
-    const response = await axios.post(`${BASE_URL}/forecasts/live`, {
-      api_key_private: API_KEY,
-      venue_id: venueId
-    });
+    const url = `${BASE_URL}/forecasts/live?api_key_private=${API_KEY}&venue_id=${venueId}`;
+    const response = await axios.post(url);
+    console.log(`[BestTime Crowds] Raw Analysis for ${venueId}:`, JSON.stringify(response.data.analysis || response.data, null, 2));
 
     if (response.data.status === 'OK' && response.data.analysis) {
       const liveIntensity = response.data.analysis.venue_live_busyness_60 || 0;
