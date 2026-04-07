@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
+import rickKaneImg from './assets/rick-kane.png';
 
 // Fix for default marker icon in Leaflet + React
 // @ts-ignore
@@ -221,7 +222,11 @@ function App() {
             />
           </div>
         ),
-        icon: <User className="w-12 h-12 text-deep-teal" />
+        icon: (
+          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-sun-yellow shadow-xl mb-4">
+            <img src={rickKaneImg} alt="Rick Kane" className="w-full h-full object-cover" />
+          </div>
+        )
       },
       {
         title: "Where's Home?",
@@ -368,9 +373,13 @@ function App() {
           className="max-w-md w-full glass-card rounded-[2rem] p-10 text-center shadow-2xl"
         >
           <div className="flex justify-center mb-6">
-            <div className="bg-white/10 p-6 rounded-full shadow-inner">
-              {steps[onboardingStep].icon}
-            </div>
+            {typeof steps[onboardingStep].icon === 'object' && 'type' in (steps[onboardingStep].icon as any) && (steps[onboardingStep].icon as any).type === 'div' ? (
+              steps[onboardingStep].icon
+            ) : (
+              <div className="bg-white/10 p-6 rounded-full shadow-inner">
+                {steps[onboardingStep].icon}
+              </div>
+            )}
           </div>
           <h2 className="text-3xl font-beachy text-sun-yellow mb-4 drop-shadow-md">{steps[onboardingStep].title}</h2>
           <p className="text-lg opacity-90 leading-tight font-bold">
