@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-07T17:48:47.470Z",
+  "timestamp": "2026-04-07T18:05:55.438Z",
   "user_inputs": {
     "userName": "Max",
     "home_location": {
@@ -19,7 +19,7 @@
         "marine_raw": {
           "latitude": 8.708336,
           "longitude": 124.54167,
-          "generationtime_ms": 0.2129077911376953,
+          "generationtime_ms": 0.10395050048828125,
           "utc_offset_seconds": 0,
           "timezone": "GMT",
           "timezone_abbreviation": "GMT",
@@ -38,17 +38,17 @@
             "swell_wave_direction": "°"
           },
           "current": {
-            "time": "2026-04-07T17:45",
+            "time": "2026-04-07T18:00",
             "interval": 900,
             "wave_height": 0.22,
             "wave_period": 3.25,
-            "wave_direction": 5,
-            "wind_wave_height": 0.02,
-            "wind_wave_period": 0.1,
-            "wind_wave_direction": 122,
-            "swell_wave_height": 0.2,
+            "wave_direction": 8,
+            "wind_wave_height": 0,
+            "wind_wave_period": 0,
+            "wind_wave_direction": 199,
+            "swell_wave_height": 0.22,
             "swell_wave_period": 2.75,
-            "swell_wave_direction": 2
+            "swell_wave_direction": 8
           }
         },
         "traffic_raw": {
@@ -1350,7 +1350,7 @@
         "marine_raw": {
           "latitude": 8.708336,
           "longitude": 124.70836,
-          "generationtime_ms": 0.24175643920898438,
+          "generationtime_ms": 0.11444091796875,
           "utc_offset_seconds": 0,
           "timezone": "GMT",
           "timezone_abbreviation": "GMT",
@@ -1369,17 +1369,17 @@
             "swell_wave_direction": "°"
           },
           "current": {
-            "time": "2026-04-07T17:45",
+            "time": "2026-04-07T18:00",
             "interval": 900,
             "wave_height": 0.14,
             "wave_period": 3.05,
-            "wave_direction": 353,
-            "wind_wave_height": 0.02,
-            "wind_wave_period": 0.05,
-            "wind_wave_direction": 165,
+            "wave_direction": 356,
+            "wind_wave_height": 0,
+            "wind_wave_period": 0,
+            "wind_wave_direction": 166,
             "swell_wave_height": 0.14,
             "swell_wave_period": 2.5,
-            "swell_wave_direction": 352
+            "swell_wave_direction": 356
           }
         },
         "traffic_raw": {
@@ -3285,7 +3285,7 @@
         "marine_raw": {
           "latitude": 9.041664,
           "longitude": 124.95836,
-          "generationtime_ms": 0.23615360260009766,
+          "generationtime_ms": 0.11086463928222656,
           "utc_offset_seconds": 0,
           "timezone": "GMT",
           "timezone_abbreviation": "GMT",
@@ -3304,22 +3304,22 @@
             "swell_wave_direction": "°"
           },
           "current": {
-            "time": "2026-04-07T17:45",
+            "time": "2026-04-07T18:00",
             "interval": 900,
             "wave_height": 0.16,
             "wave_period": 3.3,
-            "wave_direction": 19,
-            "wind_wave_height": 0.02,
+            "wave_direction": 18,
+            "wind_wave_height": 0,
             "wind_wave_period": 0,
-            "wind_wave_direction": 91,
+            "wind_wave_direction": 85,
             "swell_wave_height": 0.14,
             "swell_wave_period": 2.45,
-            "swell_wave_direction": 14
+            "swell_wave_direction": 15
           }
         },
         "traffic_raw": {
           "friction": 0,
-          "travelTimeInSeconds": 7930,
+          "travelTimeInSeconds": 7942,
           "points": [
             {
               "latitude": 8.47665,
@@ -17138,7 +17138,7 @@
       "lon": 124.9989331,
       "qualityScore": 1,
       "utilityScore": 1,
-      "travelTimeInSeconds": 7930,
+      "travelTimeInSeconds": 7942,
       "travelTimeText": "132 min",
       "points": [
         {

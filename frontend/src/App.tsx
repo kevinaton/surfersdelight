@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
-import rickKaneImg from './assets/rick-kane.png';
+import rickKaneImg from './assets/image.png';
 
 // Fix for default marker icon in Leaflet + React
 // @ts-ignore
@@ -223,7 +223,7 @@ function App() {
           </div>
         ),
         icon: (
-          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-sun-yellow shadow-xl mb-4">
+          <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-sun-yellow shadow-xl mb-4">
             <img src={rickKaneImg} alt="Rick Kane" className="w-full h-full object-cover" />
           </div>
         )
@@ -482,9 +482,9 @@ function App() {
 
               {/* Map Section */}
               <div className="w-full h-48 rounded-2xl overflow-hidden mb-8 border-2 border-white/20 shadow-inner relative z-0">
-                <MapContainer 
-                  center={[homeLocation?.lat || 21.3069, homeLocation?.lon || -157.8583]} 
-                  zoom={10} 
+                <MapContainer
+                  center={[homeLocation?.lat || 21.3069, homeLocation?.lon || -157.8583]}
+                  zoom={10}
                   style={{ height: '100%', width: '100%' }}
                   zoomControl={false}
                 >
@@ -501,14 +501,14 @@ function App() {
                     <>
                       <Marker position={[scoutQuery.data.topSpots[0].lat, scoutQuery.data.topSpots[0].lon]}>
                         <Popup>
-                          <strong>{getCleanName(scoutQuery.data.topSpots[0].name)}</strong><br/>
+                          <strong>{getCleanName(scoutQuery.data.topSpots[0].name)}</strong><br />
                           Travel Time: {scoutQuery.data.topSpots[0].travelTimeText}
                         </Popup>
                       </Marker>
                       {scoutQuery.data.topSpots[0].points && (
-                        <Polyline 
-                          positions={scoutQuery.data.topSpots[0].points.map((p: any) => [p.latitude, p.longitude])} 
-                          color="#fef08a" 
+                        <Polyline
+                          positions={scoutQuery.data.topSpots[0].points.map((p: any) => [p.latitude, p.longitude])}
+                          color="#fef08a"
                           weight={5}
                           opacity={0.8}
                         />
@@ -684,9 +684,9 @@ function App() {
 
             {/* Map Section */}
             <div className="w-full h-40 rounded-2xl overflow-hidden mb-8 border-2 border-white/20 shadow-inner relative z-0">
-              <MapContainer 
-                center={[selectedSpot?.lat || 21.3069, selectedSpot?.lon || -157.8583]} 
-                zoom={11} 
+              <MapContainer
+                center={[selectedSpot?.lat || 21.3069, selectedSpot?.lon || -157.8583]}
+                zoom={11}
                 style={{ height: '100%', width: '100%' }}
                 zoomControl={false}
               >
@@ -703,14 +703,14 @@ function App() {
                   <>
                     <Marker position={[selectedSpot.lat, selectedSpot.lon]}>
                       <Popup>
-                        <strong>{getCleanName(selectedSpot.name)}</strong><br/>
+                        <strong>{getCleanName(selectedSpot.name)}</strong><br />
                         Travel Time: {selectedSpot.travelTimeText}
                       </Popup>
                     </Marker>
                     {selectedSpot.points && (
-                      <Polyline 
-                        positions={selectedSpot.points.map((p: any) => [p.latitude, p.longitude])} 
-                        color="#fef08a" 
+                      <Polyline
+                        positions={selectedSpot.points.map((p: any) => [p.latitude, p.longitude])}
+                        color="#fef08a"
                         weight={5}
                         opacity={0.8}
                       />
