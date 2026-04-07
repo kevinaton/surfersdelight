@@ -18,18 +18,24 @@ export const calculateUtilityScore = (qualityScore, trafficFriction, crowdFricti
 };
 
 export const getQualityScore = (waveHeight, period, windSpeed, isOffshore) => {
-  let score = 5; // Base score
+  let score = 3; // Base score (lower base for tiny waves)
 
-  // Height logic (simplified for PoC)
-  if (waveHeight >= 3 && waveHeight <= 6) score += 2;
-  if (waveHeight > 6 && waveHeight <= 10) score += 3;
+  // Height logic: More granular for smaller waves
+  if (waveHeight < 1) score += (waveHeight * 2); // 0.5ft adds 1.0, 0.7ft adds 1.4
+  else if (waveHeight >= 1 && waveHeight < 3) score += 3;
+  else if (waveHeight >= 3 && waveHeight <= 6) score += 5;
+  else if (waveHeight > 6 && waveHeight <= 10) score += 6;
+  else if (waveHeight > 10) score += 7; // Heavy water!
   
-  // Period logic
+  // Period logic: Longer is almost always better
   if (period >= 12) score += 2;
+  else if (period >= 8) score += 1;
+  else if (period < 4) score -= 1; // Super wind-chop / weak
   
   // Wind logic
-  if (isOffshore) score += 1;
+  if (isOffshore) score += 1.5;
   if (windSpeed < 5) score += 1; // Glassy
+  else if (windSpeed > 15 && !isOffshore) score -= 2; // Blown out
 
-  return Math.min(10, score);
+  return Math.min(10, Math.max(1, parseFloat(score.toFixed(1))));
 };

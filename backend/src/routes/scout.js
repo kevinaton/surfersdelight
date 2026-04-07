@@ -135,7 +135,20 @@ router.post('/current', async (req, res) => {
   }));
 
   const filteredResults = results.filter(r => r !== null);
-  filteredResults.sort((a, b) => b.utilityScore - a.utilityScore);
+  
+  // Sorting with tie-breakers: 
+  // 1. Utility Score (Primary)
+  // 2. Quality Score (Secondary)
+  // 3. Travel Time (Tertiary - lower is better)
+  filteredResults.sort((a, b) => {
+    if (b.utilityScore !== a.utilityScore) {
+      return b.utilityScore - a.utilityScore;
+    }
+    if (b.qualityScore !== a.qualityScore) {
+      return b.qualityScore - a.qualityScore;
+    }
+    return a.travelTimeInSeconds - b.travelTimeInSeconds;
+  });
 
   // Capture everything to data.json
   logSessionData({
