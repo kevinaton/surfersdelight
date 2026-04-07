@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
 
 const GEOAPIFY_KEY = '8b1980edbcc140a2881a865b18054977';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 const fetchScoutData = async (payload: { userName: string, spots: any[], home_location: any, sensitivity: number }) => {
   const { data } = await axios.post(`${API_BASE_URL}/api/scout/current`, payload);
