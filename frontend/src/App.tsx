@@ -20,23 +20,25 @@ L.Icon.Default.mergeOptions({
 
 const GEOAPIFY_KEY = '8b1980edbcc140a2881a865b18054977';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const fetchScoutData = async (payload: { userName: string, spots: any[], home_location: any, sensitivity: number }) => {
-  const { data } = await axios.post(`http://localhost:3001/api/scout/current`, payload);
+  const { data } = await axios.post(`${API_BASE_URL}/api/scout/current`, payload);
   return data;
 };
 
 const fetchItineraryData = async (spot: any) => {
-  const { data } = await axios.get(`http://localhost:3001/api/itinerary/${spot.name}?lat=${spot.lat}&lon=${spot.lon}`);
+  const { data } = await axios.get(`${API_BASE_URL}/api/itinerary/${spot.name}?lat=${spot.lat}&lon=${spot.lon}`);
   return data;
 };
 
 const searchLocations = async (text: string) => {
-  const { data } = await axios.get(`http://localhost:3001/api/geocoding/search?text=${text}`);
+  const { data } = await axios.get(`${API_BASE_URL}/api/geocoding/search?text=${text}`);
   return data;
 };
 
 const sendMessageToRick = async (payload: { message: string, history: any[] }) => {
-  const { data } = await axios.post('http://localhost:3001/api/chat', payload);
+  const { data } = await axios.post(`${API_BASE_URL}/api/chat`, payload);
   return data;
 };
 
