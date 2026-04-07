@@ -1,6 +1,7 @@
 {
   "name": "surfers-delight",
   "private": true,
+  "type": "module",
   "workspaces": [
     "frontend",
     "backend"
