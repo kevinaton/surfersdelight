@@ -583,15 +583,15 @@ function App() {
 
                 {scoutQuery.data?.topSpots[0] && (
                   <div className="bg-white/10 p-5 rounded-lg border border-white/20 italic text-sm leading-relaxed font-bold">
-                    <p className="opacity-90">"{scoutQuery.data.topSpots[0].rickKaneInsight}"</p>
-                    <p className="mt-2 text-right font-beachy text-sun-yellow not-italic">— Rick Kane</p>
+                    <p className="opacity-90">"{RICK_ENCOURAGEMENTS[Math.floor(Math.random() * RICK_ENCOURAGEMENTS.length)]}"</p>
+                    <p className="mt-2 text-right font-beachy text-sun-yellow not-italic">— Rick Kane's Daily Briefing</p>
                   </div>
                 )}
 
                 <motion.button
                   whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(254, 240, 138, 0.4)" }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => scoutQuery.refetch()}
+                  onClick={() => scoutQuery.data?.topSpots[0] && handleGoShred(scoutQuery.data.topSpots[0])}
                   className="w-full btn-primary py-4 rounded-2xl text-lg flex items-center justify-center gap-2 transition-shadow shadow-lg"
                 >
                   <Waves className="w-6 h-6 animate-pulse" />
@@ -777,7 +777,7 @@ function App() {
                     key={rec.name}
                     className="bg-white/10 p-5 rounded-lg border border-white/20 shadow-sm"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-white/10 rounded-lg">
                           {rec.type === 'Refuel' ? <Coffee className="w-5 h-5 text-deep-teal" /> : <ShoppingBag className="w-5 h-5 text-deep-teal" />}
@@ -787,9 +787,7 @@ function App() {
                           <p className="text-lg font-black leading-none tracking-tight">{rec.name}</p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-black bg-white/20 px-2 py-1 rounded-md">{rec.distance}</span>
                     </div>
-                    <p className="text-sm opacity-80 leading-relaxed italic font-bold text-deep-teal">"{rec.insight}"</p>
                   </motion.div>
                 ))
               )}

@@ -52,9 +52,9 @@ router.post('/', async (req, res) => {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Using Gemini 2.5 Flash as requested
+    // Using Gemini 1.5 Flash - most stable for now
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash"
+      model: "gemini-1.5-flash"
     });
 
     // Format history exactly as expected
@@ -94,21 +94,28 @@ User: ${message}`;
   } catch (error) {
     console.error("GEMINI SDK ERROR:", error);
     
-    // Fallback if chat session fails (e.g. invalid history format)
+    // Fallback if chat session fails (e.g. invalid history format or 429 Quota)
     try {
-      console.log("Attempting single-shot fallback...");
+      console.log("Attempting single-shot fallback with 1.5-flash...");
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = `System: You are Rick Kane from North Shore. Use surf slang. Do not use swear words.\n\nUser: ${message}`;
+      const prompt = `System: You are Rick Kane from North Shore. Use surf slang. Do not use swear words. Style: Extreme brevity. Max 2 sentences.\n\nUser: ${message}`;
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       return res.json({ text });
     } catch (fallbackError) {
-      console.error("FALLBACK ERROR:", fallbackError);
-      res.status(500).json({ 
-        error: error.message || "Rick Kane is caught in the impact zone.",
-        tip: "Check if the Gemini API is enabled in your Google Cloud Console."
-      });
+      console.error("FALLBACK ERROR:", fallbackError.message);
+      
+      // Final hardcoded fallback if everything fails
+      const fallbacks = [
+        "The ocean is calling, but the signal is weak. Just go shred, braddah!",
+        "Rick is out in the lineup and can't talk right now. Paddle out!",
+        "Cowabunga! My connection is wipeout, but the swell is still pumping!",
+        "Stay stoked! I'm caught in the impact zone, catch you on the next wave."
+      ];
+      const randomMsg = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      
+      res.json({ text: randomMsg });
     }
   }
 });

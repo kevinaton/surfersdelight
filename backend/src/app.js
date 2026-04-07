@@ -1,13 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import scoutRoutes from './routes/scout.js';
 import itineraryRoutes from './routes/itinerary.js';
 import chatRoutes from './routes/chat.js';
 import geocodingRoutes from './routes/geocoding.js';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Explicitly point to the .env file in the backend folder
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 
 const app = express();
 

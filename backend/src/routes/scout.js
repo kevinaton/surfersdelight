@@ -93,7 +93,7 @@ router.post('/current', async (req, res) => {
       const qScore = getQualityScore(waveHeight, period, 8, true); 
       const uScore = calculateUtilityScore(qScore, traffic.friction, crowdFriction, sensitivity);
 
-      // 5. Get Rick Kane Personality
+      // 5. Build Spot Data (NO individual Gemini call here)
       const spotData = {
         name: spot.name,
         waveHeight: parseFloat(waveHeight.toFixed(1)),
@@ -101,7 +101,6 @@ router.post('/current', async (req, res) => {
         windSpeed: 8,
         isOffshore: true
       };
-      const insight = await getRickKaneInsight(spotData, uScore);
 
       // Log Raw Data for this spot
       raw_api_logs.push({
@@ -109,8 +108,7 @@ router.post('/current', async (req, res) => {
         marine_raw: marineResponse,
         traffic_raw: traffic,
         crowd_raw: { friction: crowdFriction },
-        scoring: { qualityScore: qScore, utilityScore: uScore },
-        rick_kane_insight: insight
+        scoring: { qualityScore: qScore, utilityScore: uScore }
       });
 
       return {
@@ -121,7 +119,6 @@ router.post('/current', async (req, res) => {
         utilityScore: uScore,
         travelTimeInSeconds: traffic.travelTimeInSeconds,
         travelTimeText: `${Math.round(traffic.travelTimeInSeconds / 60)} min`,
-        rickKaneInsight: insight,
         points: traffic.points,
         friction: {
           crowd: crowdFriction,
